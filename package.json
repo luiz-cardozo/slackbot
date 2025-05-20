@@ -1,0 +1,19 @@
+{
+  "name": "slackbot-roberval",
+  "version": "1.0.0",
+  "description": "Bot assistente para realização de tarefas rotineiras",
+  "main": "server.js",
+  "scripts": {
+    "start": "node src/server.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Luiz Fernando Cardozo",
+  "license": "ISC",
+  "dependencies": {
+    "@slack/bolt": "^4.2.1",
+    "@slack/web-api": "^7.9.1",
+    "body-parser": "^2.2.0",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0"
+  }
+}
