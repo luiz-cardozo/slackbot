@@ -9,7 +9,7 @@ export async function openTicketModal(trigger_id, responseUrl) {
   });
 
   const ticketChannels = channelsResponse.channels
-    .filter((channel) => channel.name.startsWith("tickets-"))
+    .filter((channel) => /^(tickets-?.*|.*-?tickets)$/.test(channel.name))
     .map((channel) => ({
       text: {
         type: "plain_text",
