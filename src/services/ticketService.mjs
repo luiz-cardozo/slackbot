@@ -9,7 +9,7 @@ export async function openTicketModal(trigger_id, responseUrl) {
   });
 
   const ticketChannels = channelsResponse.channels
-    .filter((channel) => /(^tickets(-|$)|(-|^)tickets$)/i.test(channel.name))
+    .filter((channel) => /(^ticket|ticket$)/i.test(channel.name))
     .map((channel) => ({
       text: {
         type: "plain_text",
