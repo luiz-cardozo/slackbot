@@ -9,7 +9,10 @@ const getTicketChannels = async () => {
     types: "public_channel,private_channel",
   });
   return channelsResponse.channels
-    .filter((channel) => channel.name.startsWith("tickets-"))
+    .filter((channel) => {
+      const channelName = channel.name.toLowerCase();
+      return channelName.startsWith("tickets") || channelName.endsWith("tickets");
+    })
     .map((channel) => ({
       text: { type: "plain_text", text: `#${channel.name}`, emoji: true },
       value: channel.id,
@@ -91,6 +94,62 @@ const buildMaterialModal = () => ({
         type: "plain_text_input",
         action_id: "quantity_input",
         placeholder: { type: "plain_text", text: "Quantidade necessária" },
+      },
+    },
+    {
+      type: "input",
+      block_id: "urgency_block",
+      label: { type: "plain_text", text: "Urgência" },
+      element: {
+        type: "static_select",
+        action_id: "urgency_select",
+        options: [
+          { text: { type: "plain_text", text: "Baixa" }, value: "low" },
+          { text: { type: "plain_text", text: "Média" }, value: "medium" },
+          { text: { type: "plain_text", text: "Alta" }, value: "high" },
+        ],
+        placeholder: { type: "plain_text", text: "Selecione a urgência" },
+      },
+    },
+  ],
+});
+
+
+const buildSupportModal = () => ({
+  type: "modal",
+  callback_id: "support_request",
+  title: { type: "plain_text", text: "Solicitar Suporte" },
+  submit: { type: "plain_text", text: "Enviar" },
+  close: { type: "plain_text", text: "Cancelar" },
+  blocks: [
+    {
+      type: "input",
+      block_id: "equipment_block",
+      label: { type: "plain_text", text: "Qual equipamento você precisa de suporte?" },
+      element: {
+        type: "plain_text_input",
+        action_id: "equipment_input",
+        placeholder: { type: "plain_text", text: "Ex: teclado falhando, dead pixel na tela..." },
+      },
+    },
+    {
+      type: "input",
+      block_id: "justification_block",
+      label: { type: "plain_text", text: "Detalhe a sua demanda e justifique a necessidade" },
+      element: {
+        type: "plain_text_input",
+        action_id: "justification_input",
+        placeholder: { type: "plain_text", text: "Ex: novo projeto demanda maior capacidade de processamento" },
+      },
+    },
+    {
+      type: "input",
+      block_id: "name_block",
+      label: { type: "plain_text", text: "Adicione seu nome e área" },
+      element: {
+        type: "plain_text_input",
+        action_id: "name_input",
+        placeholder: { type: "plain_text", text: "Ex: Roberval - Bot" },
       },
     },
     {
@@ -200,11 +259,46 @@ const handleMaterialRequest = async (payload, res) => {
   });
 };
 
+const handleSupportRequest = async (payload, res) => {
+  const values = payload.view.state.values;
+  const equipment = values.equipment_block.equipment_input.value;
+  const justification = values.justification_block.justification_input.value;
+  const name = values.name_block.name_input.value;
+  const channel = process.env.SUPPORT_CHANNEL_ID;
+  const urgencyText = { low: "Baixa", medium: "Média", high: "Alta" }[urgency];
+
+  await slackClient.chat.postMessage({
+    channel,
+    text: `:package: Nova solicitação de suporte\n*Equipamento:* ${material}\n*Justificativa:* ${justification}\n*Solicitante:* ${name}\n*Urgência:* ${urgencyText}`,
+  });
+
+  return res.json({
+    response_action: "update",
+    view: {
+      type: "modal",
+      title: { type: "plain_text", text: "Solicitação Enviada" },
+      close: { type: "plain_text", text: "Fechar" },
+      blocks: [
+        {
+          type: "section",
+          text: { type: "mrkdwn", text: ":white_check_mark: Sua solicitação de suporte foi enviada com sucesso!" },
+        },
+        {
+          type: "section",
+          text: { type: "mrkdwn", text: `*Equipamento:* ${equipment}\n*Justificativa:* ${justification}\n*Nome:* ${userId}\n*Urgência:* ${urgencyText}` },
+        },
+      ],
+    },
+  });
+};
+
 export default {
   getTicketChannels,
   buildTicketModal,
   buildMaterialModal,
+  buildSupportModal,
   openModal,
   handleTicketSubmission,
   handleMaterialRequest,
+  handleSupportRequest
 };
