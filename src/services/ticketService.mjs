@@ -6,6 +6,7 @@ import { ticketSuccessModal } from "../views/ticketSuccessModal.mjs";
 export async function openTicketModal(trigger_id, responseUrl) {
   const channelsResponse = await slackClient.conversations.list({
     types: "public_channel,private_channel",
+    limit: 500
   });
 
   const ticketChannels = channelsResponse.channels
@@ -18,6 +19,11 @@ export async function openTicketModal(trigger_id, responseUrl) {
       },
       value: channel.id,
     }));
+
+  if (ticketChannels.length === 0) {
+    console.error("Nenhum canal correspondente encontrado. Não é possível abrir o modal.");
+    return; 
+  }
 
   const view = buildTicketModal(ticketChannels, responseUrl);
 
