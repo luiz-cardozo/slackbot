@@ -2,9 +2,10 @@
   "name": "slackbot-roberval",
   "version": "1.0.0",
   "description": "Bot assistente para realização de tarefas rotineiras",
-  "main": "server.js",
+  "main": "app.js",
+  "type": "module",
   "scripts": {
-    "start": "node src/server.mjs",
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Luiz Fernando Cardozo",
