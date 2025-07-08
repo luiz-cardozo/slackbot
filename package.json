@@ -12,9 +12,6 @@
   "license": "ISC",
   "dependencies": {
     "@slack/bolt": "^4.2.1",
-    "@slack/web-api": "^7.9.1",
-    "body-parser": "^2.2.0",
-    "dotenv": "^16.4.7",
-    "express": "^5.1.0"
+    "dotenv": "^16.4.7"
   }
 }
